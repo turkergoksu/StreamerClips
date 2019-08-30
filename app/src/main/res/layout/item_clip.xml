@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_margin="4dp"
+    android:elevation="3dp"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_margin="4dp"
+            android:id="@+id/iv_clip_thumbnail"
+            android:layout_width="125dp"
+            android:layout_height="100dp"
+            app:srcCompat="@mipmap/ic_launcher" />
+
+        <TextView
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textStyle="bold"
+            android:textSize="24sp"
+            android:layout_margin="4dp"
+            android:id="@+id/tv_clip_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:layout_toEndOf="@+id/iv_clip_thumbnail"
+            android:text="Clip title" />
+
+        <LinearLayout
+            android:id="@+id/linear_broadcaster_wrapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_clip_title"
+            android:layout_margin="4dp"
+            android:layout_toEndOf="@+id/iv_clip_thumbnail"
+            android:orientation="horizontal">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/iv_broadcaster_channel_image"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:src="@mipmap/ic_launcher_round" />
+
+            <TextView
+                android:ellipsize="end"
+                android:layout_marginStart="4dp"
+                android:textSize="18sp"
+                android:id="@+id/tv_broadcaster_channel_name"
+                android:layout_gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="broadcaster channel name" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linear_clip_creator_wrapper"
+            android:layout_width="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/linear_broadcaster_wrapper"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"
+            android:orientation="horizontal">
+
+            <!--<TextView-->
+            <!--android:id="@+id/tv_fixed_created_by"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="created by:"-->
+            <!--android:textSize="16sp"-->
+            <!--android:textStyle="italic" />-->
+
+            <TextView
+                android:id="@+id/tv_clip_creator_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:ellipsize="end"
+                android:text="clip creator"
+                android:textSize="18sp"
+                android:textStyle="italic" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linear_view_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/linear_broadcaster_wrapper"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"
+            android:layout_toEndOf="@+id/iv_clip_thumbnail"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:src="@drawable/icons8_eye_24"
+                android:layout_gravity="center_vertical"
+                android:id="@+id/ic_fixed_eye"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+
+            <TextView
+                android:id="@+id/tv_clip_view_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:ellipsize="end"
+                android:text="view count"
+                android:textSize="18sp"
+                android:textStyle="italic" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>
