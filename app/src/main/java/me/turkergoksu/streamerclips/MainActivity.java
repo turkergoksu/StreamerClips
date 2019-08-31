@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -30,10 +31,18 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private ArrayList<String> streamerIdList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // TODO: 31-Aug-19 temporary. I will take the streamer id list later from database
+        streamerIdList = new ArrayList<>();
+        streamerIdList.add("6768122");
+        streamerIdList.add("24233423");
+        streamerIdList.add("51950404");
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction
@@ -43,34 +52,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
-    public String clipUrlBuilder(String broadcasterID, int first, String startedAt){
-        StringBuilder url = new StringBuilder("https://api.twitch.tv/helix/clips?");
-        url.append("broadcaster_id=").append(broadcasterID).append("&");
-        url.append("first=").append(first).append("&");
-        url.append("started_at=").append(startedAt);
-
-        return url.toString();
-    }
-
-    public String streamersUrlBuilder(String[] streamerArray){
-        StringBuilder url = new StringBuilder("https://api.twitch.tv/helix/users?");
-        url.append("login=").append(streamerArray[0]);
-        for (String username : streamerArray){
-            url.append("&login=").append(username);
-        }
-
-        return url.toString();
-    }
-
     public String singleUserUrlBuilder(String username){
         StringBuilder url = new StringBuilder("https://api.twitch.tv/helix/users?");
         url.append("login=").append(username);
 
         return url.toString();
     }
-
 
     public JsonArrayRequest jsonArrayRequest(String url){
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
@@ -99,5 +86,13 @@ public class MainActivity extends AppCompatActivity {
         };
 
         return jsonArrayRequest;
+    }
+
+    public ArrayList<String> getStreamerIdList() {
+        return streamerIdList;
+    }
+
+    public void backButton(View view){
+        getSupportFragmentManager().popBackStack();
     }
 }

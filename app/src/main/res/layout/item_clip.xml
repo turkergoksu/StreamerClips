@@ -8,6 +8,7 @@
     android:layout_height="wrap_content">
 
     <RelativeLayout
+        android:id="@+id/rl_clip_item_wrapper"
         android:background="@color/colorMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -64,11 +65,11 @@
         <LinearLayout
             android:id="@+id/linear_clip_creator_wrapper"
             android:layout_width="wrap_content"
-            android:layout_alignParentEnd="true"
             android:layout_height="wrap_content"
             android:layout_below="@+id/linear_broadcaster_wrapper"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
+            android:layout_alignParentEnd="true"
             android:layout_marginBottom="4dp"
             android:orientation="horizontal">
 
@@ -82,7 +83,7 @@
 
             <TextView
                 android:id="@+id/tv_clip_creator_name"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:ellipsize="end"
@@ -106,7 +107,7 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:src="@drawable/icons8_eye_24"
+                android:src="@drawable/ic_view_count"
                 android:layout_gravity="center_vertical"
                 android:id="@+id/ic_fixed_eye"
                 android:layout_width="20dp"

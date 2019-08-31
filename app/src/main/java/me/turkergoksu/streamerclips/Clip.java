@@ -1,6 +1,9 @@
 package me.turkergoksu.streamerclips;
 
-public class Clip {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Clip implements Parcelable {
 
     private String id;
     private String url;
@@ -29,6 +32,32 @@ public class Clip {
         this.createdAt = createdAt;
         this.thumbnailImageURL = thumbnailImageURL;
     }
+
+    public Clip(Parcel in) {
+        id = in.readString();
+        url = in.readString();
+        embedURL = in.readString();
+        broadcasterID = in.readString();
+        broadcasterName = in.readString();
+        creatorID = in.readString();
+        creatorName = in.readString();
+        title = in.readString();
+        viewCount = in.readInt();
+        createdAt = in.readString();
+        thumbnailImageURL = in.readString();
+    }
+
+    public static final Creator<Clip> CREATOR = new Creator<Clip>() {
+        @Override
+        public Clip createFromParcel(Parcel in) {
+            return new Clip(in);
+        }
+
+        @Override
+        public Clip[] newArray(int size) {
+            return new Clip[size];
+        }
+    };
 
     public String getId() {
         return id;
@@ -117,4 +146,25 @@ public class Clip {
     public void setThumbnailImageURL(String thumbnailImageURL) {
         this.thumbnailImageURL = thumbnailImageURL;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(id);
+        parcel.writeString(url);
+        parcel.writeString(embedURL);
+        parcel.writeString(broadcasterID);
+        parcel.writeString(broadcasterName);
+        parcel.writeString(creatorID);
+        parcel.writeString(creatorName);
+        parcel.writeString(title);
+        parcel.writeInt(viewCount);
+        parcel.writeString(createdAt);
+        parcel.writeString(thumbnailImageURL);
+    }
+
 }

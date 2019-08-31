@@ -2,6 +2,7 @@ package me.turkergoksu.streamerclips;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,11 +10,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+
+import me.turkergoksu.streamerclips.Fragments.ClipFragment;
 
 public class ClipAdapter extends RecyclerView.Adapter<ClipAdapter.ClipViewHolder> {
 
@@ -55,7 +59,7 @@ public class ClipAdapter extends RecyclerView.Adapter<ClipAdapter.ClipViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ClipViewHolder holder, int position) {
-        Clip clip = clipArrayList.get(position);
+        final Clip clip = clipArrayList.get(position);
 
         Glide.with(context).load(Uri.parse(clip.getThumbnailImageURL())).into(holder.thumbnailImageView);
 
@@ -64,6 +68,23 @@ public class ClipAdapter extends RecyclerView.Adapter<ClipAdapter.ClipViewHolder
         holder.clipViewCountTextView.setText(String.valueOf(clip.getViewCount()));
         holder.clipCreatorNameTextView.setText(clip.getCreatorName());
 
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentTransaction fragmentTransaction = ((MainActivity) context).getSupportFragmentManager().beginTransaction();
+
+                Bundle args = new Bundle();
+                args.putParcelable("clip", clip);
+
+                ClipFragment clipFragment = new ClipFragment();
+                clipFragment.setArguments(args);
+
+                fragmentTransaction
+                        .replace(R.id.frame_layout, clipFragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
     }
 
     @Override
