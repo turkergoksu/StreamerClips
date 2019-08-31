@@ -31,6 +31,7 @@ public class ClipAdapter extends RecyclerView.Adapter<ClipAdapter.ClipViewHolder
         private TextView channelNameTextView;
         private TextView clipViewCountTextView;
         private TextView clipCreatorNameTextView;
+        private TextView placeNumberTextView;
 
         public ClipViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -40,6 +41,7 @@ public class ClipAdapter extends RecyclerView.Adapter<ClipAdapter.ClipViewHolder
             channelNameTextView = itemView.findViewById(R.id.tv_broadcaster_channel_name);
             clipViewCountTextView = itemView.findViewById(R.id.tv_clip_view_count);
             clipCreatorNameTextView = itemView.findViewById(R.id.tv_clip_creator_name);
+            placeNumberTextView = itemView.findViewById(R.id.tv_place_number);
         }
     }
 
@@ -67,6 +69,7 @@ public class ClipAdapter extends RecyclerView.Adapter<ClipAdapter.ClipViewHolder
         holder.channelNameTextView.setText(clip.getBroadcasterName());
         holder.clipViewCountTextView.setText(String.valueOf(clip.getViewCount()));
         holder.clipCreatorNameTextView.setText(clip.getCreatorName());
+        holder.placeNumberTextView.setText(new StringBuilder().append("#").append(position+1).toString());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -20,6 +20,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -68,6 +69,8 @@ public class TopClipsFragment extends Fragment {
                     clipArrayList.add(clip.getKey());
                 }
                 clipAdapter.notifyDataSetChanged();
+//                String urlFor100 = streamersUrlBuilder(getResources().getStringArray(R.array.streamernamelist));
+//                addToRequestQueue(getUserInfosAsJSON(urlFor100), "streamer100tag");
             }
         });
 
@@ -83,14 +86,9 @@ public class TopClipsFragment extends Fragment {
         clipAdapter = new ClipAdapter(clipArrayList, getContext());
         clipsRecyclerView.setAdapter(clipAdapter);
 
-        //        String url = "https://api.twitch.tv/helix/users?id=6768122";
-//        String url = "https://api.twitch.tv/helix/clips?broadcaster_id=6768122&first=5&started_at=2019-08-23T20:32:00Z";
-//        String url = "https://api.twitch.tv/helix/clips?id=AmazingBloodyAnteaterMau5";
-//        String url = "https://api.twitch.tv/kraken/streams/?game=Overwatch";
-
         for (String streamerId : ((MainActivity) getActivity()).getStreamerIdList()){
             String url = clipUrlBuilder(streamerId, 20, "2019-08-24T20:00:00Z");
-            addToRequestQueue(jsonObjectGetRequest(url), "headerRequest");
+            addToRequestQueue(getClipsOfStreamerAsJSON(url), "headerRequest");
         }
 
     }
@@ -106,13 +104,14 @@ public class TopClipsFragment extends Fragment {
         getRequestQueue().add(request);
     }
 
-    public JsonObjectRequest jsonObjectGetRequest(String url){
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,
+    public JsonObjectRequest getClipsOfStreamerAsJSON(final String url){
+        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,
                 url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         //Success Callback
+                        Log.d(TAG, "onResponse: success");
                         try {
                             JSONArray data = (JSONArray) response.get("data");
 
@@ -144,7 +143,8 @@ public class TopClipsFragment extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         //Failure Callback
-                        Log.d(TAG, "onErrorResponse: " + error.getLocalizedMessage());
+                        Log.d(TAG, "onErrorResponse: fail");
+                        addToRequestQueue(getClipsOfStreamerAsJSON(url), "again");
                     }
                 })
         {
@@ -173,9 +173,9 @@ public class TopClipsFragment extends Fragment {
         return url.toString();
     }
 
-    public String streamersUrlBuilder(ArrayList<String> streamerArray){
+    public String streamersUrlBuilder(String[] streamerArray){
         StringBuilder url = new StringBuilder("https://api.twitch.tv/helix/users?");
-        url.append("login=").append(streamerArray.get(0));
+        url.append("login=").append(streamerArray[0]);
         for (String username : streamerArray){
             url.append("&login=").append(username);
         }
@@ -183,8 +183,7 @@ public class TopClipsFragment extends Fragment {
         return url.toString();
     }
 
-    public static HashMap<Clip, Integer> sortByValue(HashMap<Clip, Integer> hm)
-    {
+    public static HashMap<Clip, Integer> sortByValue(HashMap<Clip, Integer> hm) {
         // Create a list from elements of HashMap
         List<Map.Entry<Clip, Integer> > list =
                 new LinkedList<Map.Entry<Clip, Integer> >(hm.entrySet());
@@ -204,6 +203,53 @@ public class TopClipsFragment extends Fragment {
             temp.put(aa.getKey(), aa.getValue());
         }
         return temp;
+    }
+
+    public JsonObjectRequest getUserInfosAsJSON(String url){
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,
+                url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        //Success Callback
+                        Log.d(TAG, "onResponse: " + response.toString());
+                        try {
+                            JSONArray data = (JSONArray) response.get("data");
+                            for (int i = 0; i < data.length(); ++i){
+                                JSONObject child = (JSONObject) data.get(i);
+
+                                String id = child.getString("id");
+                                String displayName = child.getString("display_name");
+                                FirebaseDatabase.getInstance().getReference().child("StreamerList").child(displayName).setValue(id);
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //Failure Callback
+                        Log.d(TAG, "onErrorResponse: " + error.getLocalizedMessage());
+                    }
+                })
+        {
+
+            @Override
+            public Map getHeaders() throws AuthFailureError {
+                HashMap headers = new HashMap();
+                headers.put("Content-Type", "application/json");
+
+                // TODO: 30-Aug-19 ignore twitch_client_id.xml
+                headers.put("Client-ID", getResources().getString(R.string.twitch_client_id));
+                return headers;
+            }
+
+        };
+
+        return jsonObjectRequest;
     }
 
 }

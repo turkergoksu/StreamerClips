@@ -20,17 +20,17 @@
     <WebView
         android:id="@+id/wv_embed_clip"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="match_parent"
         android:layout_below="@+id/toolbar"
         android:layout_marginTop="0dp">
 
     </WebView>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/wv_embed_clip"
-        android:layout_marginTop="0dp"
-        android:text="Clip Fragment" />
+    <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_below="@+id/wv_embed_clip"-->
+        <!--android:layout_marginTop="0dp"-->
+        <!--android:text="Clip Fragment" />-->
 
 </RelativeLayout>

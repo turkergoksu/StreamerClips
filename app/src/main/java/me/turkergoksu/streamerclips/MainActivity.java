@@ -1,5 +1,6 @@
 package me.turkergoksu.streamerclips;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -7,23 +8,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import me.turkergoksu.streamerclips.Fragments.TopClipsFragment;
 
@@ -38,17 +33,35 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // TODO: 31-Aug-19 temporary. I will take the streamer id list later from database
-        streamerIdList = new ArrayList<>();
-        streamerIdList.add("6768122");
-        streamerIdList.add("24233423");
-        streamerIdList.add("51950404");
+        if (streamerIdList == null)
+            streamerIdList = new ArrayList<>();
 
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction
-                .replace(R.id.frame_layout, new TopClipsFragment())
-                .addToBackStack(null)
-                .commit();
+        FirebaseApp.initializeApp(this);
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(getResources().getString(R.string.email),
+                getResources().getString(R.string.password)).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                FirebaseDatabase.getInstance().getReference().child("StreamerList").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot childSnapshot : dataSnapshot.getChildren()){
+                            streamerIdList.add((String) childSnapshot.getValue());
+                        }
+
+                        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                        fragmentTransaction
+                                .replace(R.id.frame_layout, new TopClipsFragment())
+                                .addToBackStack(null)
+                                .commit();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+        });
 
     }
 
@@ -57,35 +70,6 @@ public class MainActivity extends AppCompatActivity {
         url.append("login=").append(username);
 
         return url.toString();
-    }
-
-    public JsonArrayRequest jsonArrayRequest(String url){
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray response) {
-                Log.d(TAG, "onResponse: " + response.toString());
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap headers = new HashMap();
-                Log.d(TAG, "getHeaders: ");
-                headers.put("Content-Type", "application/json");
-
-                // TODO: 30-Aug-19 ignore twitch_client_id.xml
-                headers.put("Client-ID", getResources().getString(R.string.twitch_client_id));
-                return headers;
-            }
-        };
-
-        return jsonArrayRequest;
     }
 
     public ArrayList<String> getStreamerIdList() {
