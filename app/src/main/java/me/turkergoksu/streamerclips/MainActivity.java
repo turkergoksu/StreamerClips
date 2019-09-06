@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -20,7 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-import me.turkergoksu.streamerclips.Fragments.TopClipsFragment;
+import me.turkergoksu.streamerclips.Feed.FeedFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
                         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                         fragmentTransaction
-                                .replace(R.id.frame_layout, new TopClipsFragment())
+                                .replace(R.id.frame_layout, new FeedFragment())
                                 .addToBackStack(null)
                                 .commit();
                     }

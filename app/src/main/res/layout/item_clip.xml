@@ -30,12 +30,65 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent" />
 
-            <ImageView
-                android:layout_margin="4dp"
-                android:id="@+id/iv_clip_thumbnail"
-                android:layout_width="125dp"
-                android:layout_height="100dp"
-                app:srcCompat="@mipmap/ic_launcher" />
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_margin="4dp"
+                    android:id="@+id/iv_clip_thumbnail"
+                    android:layout_width="128dp"
+                    android:layout_height="72dp"
+                    app:srcCompat="@mipmap/ic_launcher" />
+
+                <ImageView
+                    android:layout_margin="2dp"
+                    android:id="@+id/ic_fixed_eye"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_alignBottom="@+id/iv_clip_thumbnail"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="0dp"
+                    android:layout_marginBottom="0dp"
+                    android:layout_toStartOf="@+id/tv_clip_view_count"
+                    android:src="@drawable/ic_view_count" />
+
+                <TextView
+                    android:layout_margin="2dp"
+                    android:id="@+id/tv_clip_view_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignEnd="@+id/iv_clip_thumbnail"
+                    android:layout_alignBottom="@+id/iv_clip_thumbnail"
+                    android:layout_marginEnd="0dp"
+                    android:layout_marginBottom="0dp"
+                    android:ellipsize="end"
+                    android:text="view count"
+                    android:textColor="@color/textColorForItem"
+                    android:textSize="16sp"
+                    android:textStyle="italic" />
+
+            </RelativeLayout>
+
+
+
+            <!--<ImageView-->
+                <!--android:src="@drawable/ic_view_count"-->
+                <!--android:layout_gravity="center_vertical"-->
+                <!--android:id="@+id/ic_fixed_eye"-->
+                <!--android:layout_width="20dp"-->
+                <!--android:layout_height="20dp" />-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/tv_clip_view_count"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginStart="4dp"-->
+                <!--android:ellipsize="end"-->
+                <!--android:textColor="@color/textColorForItem"-->
+                <!--android:text="view count"-->
+                <!--android:textSize="18sp"-->
+                <!--android:textStyle="italic" />-->
 
         </LinearLayout>
 
@@ -87,10 +140,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/linear_broadcaster_wrapper"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
-            android:layout_alignParentEnd="true"
             android:layout_marginBottom="4dp"
+            android:layout_toEndOf="@+id/linear_view_count"
             android:orientation="horizontal">
 
             <!--<TextView-->
@@ -107,8 +162,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:ellipsize="end"
-                android:textColor="@color/textColorForItem"
+                android:singleLine="true"
                 android:text="clip creator"
+                android:textColor="@color/textColorForItem"
                 android:textSize="18sp"
                 android:textStyle="italic" />
 
@@ -126,23 +182,13 @@
             android:layout_toEndOf="@+id/linear_thumbnail_wrapper"
             android:orientation="horizontal">
 
-            <ImageView
-                android:src="@drawable/ic_view_count"
-                android:layout_gravity="center_vertical"
-                android:id="@+id/ic_fixed_eye"
-                android:layout_width="20dp"
-                android:layout_height="20dp" />
-
             <TextView
-                android:id="@+id/tv_clip_view_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:ellipsize="end"
+                android:id="@+id/tv_clip_date"
                 android:textColor="@color/textColorForItem"
-                android:text="view count"
+                android:text="06 Sep 22:34"
                 android:textSize="18sp"
-                android:textStyle="italic" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 

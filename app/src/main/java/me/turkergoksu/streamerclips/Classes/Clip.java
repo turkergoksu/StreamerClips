@@ -1,4 +1,4 @@
-package me.turkergoksu.streamerclips;
+package me.turkergoksu.streamerclips.Classes;
 
 import android.os.Parcel;
 import android.os.Parcelable;

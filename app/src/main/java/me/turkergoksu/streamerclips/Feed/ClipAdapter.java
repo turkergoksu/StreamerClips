@@ -1,4 +1,4 @@
-package me.turkergoksu.streamerclips;
+package me.turkergoksu.streamerclips.Feed;
 
 import android.content.Context;
 import android.net.Uri;
@@ -13,16 +13,23 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
-import me.turkergoksu.streamerclips.Fragments.ClipFragment;
+import me.turkergoksu.streamerclips.Classes.Clip;
+import me.turkergoksu.streamerclips.Classes.TwitchClient;
+import me.turkergoksu.streamerclips.ClipDetails.ClipDetailsFragment;
+import me.turkergoksu.streamerclips.MainActivity;
+import me.turkergoksu.streamerclips.R;
 
 public class ClipAdapter extends RecyclerView.Adapter<ClipAdapter.ClipViewHolder> {
 
     private ArrayList<Clip> clipArrayList;
     private Context context;
+    private TwitchClient twitchClient;
 
     public static class ClipViewHolder extends RecyclerView.ViewHolder {
         private ImageView thumbnailImageView;
@@ -45,9 +52,10 @@ public class ClipAdapter extends RecyclerView.Adapter<ClipAdapter.ClipViewHolder
         }
     }
 
-    public ClipAdapter(ArrayList<Clip> clipArrayList, Context context) {
+    public ClipAdapter(ArrayList<Clip> clipArrayList, Context context, TwitchClient twitchClient) {
         this.clipArrayList = clipArrayList;
         this.context = context;
+        this.twitchClient = twitchClient;
     }
 
     @NonNull
@@ -60,9 +68,10 @@ public class ClipAdapter extends RecyclerView.Adapter<ClipAdapter.ClipViewHolder
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ClipViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ClipViewHolder holder, int position) {
         final Clip clip = clipArrayList.get(position);
 
+        // Set clip thumbnail image
         Glide.with(context).load(Uri.parse(clip.getThumbnailImageURL())).into(holder.thumbnailImageView);
 
         holder.clipTitleTextView.setText(clip.getTitle());
@@ -70,6 +79,19 @@ public class ClipAdapter extends RecyclerView.Adapter<ClipAdapter.ClipViewHolder
         holder.clipViewCountTextView.setText(String.valueOf(clip.getViewCount()));
         holder.clipCreatorNameTextView.setText(clip.getCreatorName());
         holder.placeNumberTextView.setText(new StringBuilder().append("#").append(position+1).toString());
+
+        // User request for profile image
+        Volley.newRequestQueue(context).add(twitchClient.getUsersRequest(clip.getBroadcasterID(), new TwitchClient.VolleyCallback() {
+            @Override
+            public void onComplete(HashMap<Clip, Integer> clips) {
+                // Empty
+            }
+
+            @Override
+            public void onComplete(String userImageURL) {
+                Glide.with(context).load(userImageURL).into(holder.channelImageView);
+            }
+        }));
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,11 +101,11 @@ public class ClipAdapter extends RecyclerView.Adapter<ClipAdapter.ClipViewHolder
                 Bundle args = new Bundle();
                 args.putParcelable("clip", clip);
 
-                ClipFragment clipFragment = new ClipFragment();
-                clipFragment.setArguments(args);
+                ClipDetailsFragment clipDetailsFragment = new ClipDetailsFragment();
+                clipDetailsFragment.setArguments(args);
 
                 fragmentTransaction
-                        .replace(R.id.frame_layout, clipFragment)
+                        .replace(R.id.frame_layout, clipDetailsFragment)
                         .addToBackStack(null)
                         .commit();
             }

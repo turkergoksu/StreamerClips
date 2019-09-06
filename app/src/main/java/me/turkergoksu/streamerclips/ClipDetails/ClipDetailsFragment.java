@@ -1,4 +1,4 @@
-package me.turkergoksu.streamerclips.Fragments;
+package me.turkergoksu.streamerclips.ClipDetails;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,10 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import me.turkergoksu.streamerclips.Clip;
+import me.turkergoksu.streamerclips.Classes.Clip;
 import me.turkergoksu.streamerclips.R;
 
-public class ClipFragment extends Fragment {
+public class ClipDetailsFragment extends Fragment {
 
     private Clip clip;
 
