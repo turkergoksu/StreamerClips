@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/colorBackground"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:background="@color/textColorForItem"
+        android:id="@+id/rl_top_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:visibility="gone"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/button_refresh"
+            android:layout_width="wrap_content"
+            android:text="refresh"
+            android:layout_height="wrap_content" />
+
+        <Spinner
+            android:id="@+id/spinner_timeInterval"
+            android:entries="@array/time_interval"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        </Spinner>
+
+    </RelativeLayout>
+
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_below="@id/rl_top_wrapper"
+
+        android:id="@+id/rv_clips"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+</RelativeLayout>

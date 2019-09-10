@@ -23,6 +23,9 @@ public class ClipDetailsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_clip, container, false);
 
+        // TODO: 06-Sep-19 Telefonu yataya alınca geriye gitme problemini çöz
+        // TODO: 06-Sep-19 Belki embed linki yerine direkt olarak .mp4 linkini koymayı dene
+
         if (getArguments() != null) {
             clip = getArguments().getParcelable("clip");
         }
