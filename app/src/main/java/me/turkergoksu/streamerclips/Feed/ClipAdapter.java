@@ -16,12 +16,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import me.turkergoksu.streamerclips.Classes.Clip;
 import me.turkergoksu.streamerclips.Classes.TwitchClient;
-import me.turkergoksu.streamerclips.ClipDetails.ClipDetailsFragment;
+import me.turkergoksu.streamerclips.ClipDetails.ClipDialogFragment;
 import me.turkergoksu.streamerclips.MainActivity;
 import me.turkergoksu.streamerclips.R;
 
@@ -39,6 +42,7 @@ public class ClipAdapter extends RecyclerView.Adapter<ClipAdapter.ClipViewHolder
         private TextView clipViewCountTextView;
         private TextView clipCreatorNameTextView;
         private TextView placeNumberTextView;
+        private TextView clipDateTextView;
 
         public ClipViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -49,6 +53,7 @@ public class ClipAdapter extends RecyclerView.Adapter<ClipAdapter.ClipViewHolder
             clipViewCountTextView = itemView.findViewById(R.id.tv_clip_view_count);
             clipCreatorNameTextView = itemView.findViewById(R.id.tv_clip_creator_name);
             placeNumberTextView = itemView.findViewById(R.id.tv_place_number);
+            clipDateTextView = itemView.findViewById(R.id.tv_clip_date);
         }
     }
 
@@ -78,7 +83,22 @@ public class ClipAdapter extends RecyclerView.Adapter<ClipAdapter.ClipViewHolder
         holder.channelNameTextView.setText(clip.getBroadcasterName());
         holder.clipViewCountTextView.setText(String.valueOf(clip.getViewCount()));
         holder.clipCreatorNameTextView.setText(clip.getCreatorName());
-        holder.placeNumberTextView.setText(new StringBuilder().append("#").append(position+1).toString());
+        holder.placeNumberTextView.setText(new StringBuilder().append("#").append(position + 1).toString());
+
+        // Set clip date
+        StringBuilder sb = new StringBuilder(clip.getCreatedAt());
+        sb.setCharAt(sb.indexOf("T"), ' '); // remove T
+        sb.deleteCharAt(sb.length() - 1);  // remove Z
+        try {
+            Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(sb.toString());
+            long timeInMillis = date.getTime();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMM HH:mm");
+            Date time = new Date(timeInMillis);
+            String createdAt = simpleDateFormat.format(time);
+            holder.clipDateTextView.setText(createdAt);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         // User request for profile image
         Volley.newRequestQueue(context).add(twitchClient.getUsersRequest(clip.getBroadcasterID(), new TwitchClient.VolleyCallback() {
@@ -101,13 +121,9 @@ public class ClipAdapter extends RecyclerView.Adapter<ClipAdapter.ClipViewHolder
                 Bundle args = new Bundle();
                 args.putParcelable("clip", clip);
 
-                ClipDetailsFragment clipDetailsFragment = new ClipDetailsFragment();
-                clipDetailsFragment.setArguments(args);
-
-                fragmentTransaction
-                        .replace(R.id.frame_layout, clipDetailsFragment)
-                        .addToBackStack(null)
-                        .commit();
+                ClipDialogFragment clipDialogFragment = new ClipDialogFragment();
+                clipDialogFragment.setArguments(args);
+                clipDialogFragment.show(fragmentTransaction, "clipDialogFragment");
             }
         });
     }

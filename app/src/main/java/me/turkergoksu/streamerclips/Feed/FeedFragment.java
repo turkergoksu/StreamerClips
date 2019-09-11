@@ -1,14 +1,11 @@
 package me.turkergoksu.streamerclips.Feed;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
@@ -55,8 +52,6 @@ public class FeedFragment extends Fragment {
     private HashMap<Clip, Integer> notSortedHashMap;
     private HashMap<Clip, Integer> sortedHashMap;
 
-    private SharedPreferences prefs;
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -67,15 +62,7 @@ public class FeedFragment extends Fragment {
         return view;
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-    }
-
     private void initializeViews(View view){
-        prefs = getContext().getSharedPreferences("FeedPrefs", Context.MODE_PRIVATE);
-        Log.d(TAG, "initializeViews: " + prefs.getAll());
 
         if (clipArrayList == null) {
             clipArrayList = new ArrayList<>();
@@ -89,19 +76,6 @@ public class FeedFragment extends Fragment {
                 getResources().getString(R.string.twitch_client_id),
                 getResources().getString(R.string.twitch_access_token));
 
-//        Button refreshButton = view.findViewById(R.id.button_refresh);
-//        refreshButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                clipArrayList.clear();
-//                sortedHashMap = sortByValue(notSortedHashMap);
-//                for (Map.Entry<Clip, Integer> clip : sortedHashMap.entrySet()){
-//                    clipArrayList.add(clip.getKey());
-//                }
-//                clipAdapter.notifyDataSetChanged();
-//            }
-//        });
-
         RecyclerView clipsRecyclerView = view.findViewById(R.id.rv_clips);
         clipsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         clipAdapter = new ClipAdapter(clipArrayList, getContext(), twitchClient);
@@ -111,64 +85,22 @@ public class FeedFragment extends Fragment {
         timeIntervalSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                Log.d(TAG, "onItemSelected: " + position);
-                int lastSelectedTimeInterval = prefs.getInt("lastSelectedTimeInterval", -1);
-                Log.d(TAG, "onItemSelected:last " + lastSelectedTimeInterval);
+                int lastSelectedTimeInterval = ((MainActivity)getContext()).lastSelectedTimeIntervalPosition;
 
                 // IF lastSelectedItemInterval not stored in SharedPrefs then It's called for the first time
                 if (lastSelectedTimeInterval == -1){
                     Calendar calendar = Calendar.getInstance();
                     Date now = calendar.getTime();
-                    Date firstTimeInterval = null;
-                    notSortedHashMap.clear();
-                    sortedHashMap.clear();
-                    clipArrayList.clear();
-                    clipAdapter.notifyDataSetChanged();
+                    calendar.add(Calendar.DAY_OF_MONTH, -1);
+                    Date firstTimeInterval = calendar.getTime();
                     // TODO: 10-Sep-19 Add a loading animation
 
-                    switch (position){
-                        case 0:
-                            calendar.add(Calendar.DAY_OF_MONTH, -1);
-                            firstTimeInterval = calendar.getTime();
-                            break;
-                        case 1:
-                            calendar.add(Calendar.DAY_OF_MONTH, -7);
-                            firstTimeInterval = calendar.getTime();
-                            break;
-                        case 2:
-                            calendar.add(Calendar.DAY_OF_MONTH, -30);
-                            firstTimeInterval = calendar.getTime();
-                            break;
-                    }
-
-                    for (String streamerID : ((MainActivity) getActivity()).getStreamerIdList()){
-                        JsonObjectRequest jsonObjectRequest = twitchClient.getClipsRequest(streamerID, 5, firstTimeInterval, now,
-                                new TwitchClient.VolleyCallback() {
-                                    @Override
-                                    public void onComplete(HashMap<Clip, Integer> clips) {
-                                        notSortedHashMap.putAll(clips);
-                                        clipArrayList.clear();
-                                        sortedHashMap = sortByValue(notSortedHashMap);
-                                        for (Map.Entry<Clip, Integer> clip : sortedHashMap.entrySet()){
-                                            clipArrayList.add(clip.getKey());
-                                        }
-                                        clipAdapter.notifyDataSetChanged();
-                                    }
-
-                                    @Override
-                                    public void onComplete(String userImageURL) {
-                                        // Empty
-                                    }
-                                });
-
-                        if (getContext() != null){
-                            requestQueue.add(jsonObjectRequest);
-                        }
-                    }
+                    addJsonObjectRequest(firstTimeInterval, now);
                 }
                 // IF lastSelectedItemInterval equals current selected position then we don't need to initialize clipArrayList
                 else if (lastSelectedTimeInterval == position){
                     // Empty
+                    return;
                 }
                 // IF lastSelectedItemInterval not equals selected position we need to initialize clipArrayList
                 else {
@@ -196,34 +128,10 @@ public class FeedFragment extends Fragment {
                             break;
                     }
 
-                    for (String streamerID : ((MainActivity) getActivity()).getStreamerIdList()){
-                        JsonObjectRequest jsonObjectRequest = twitchClient.getClipsRequest(streamerID, 5, firstTimeInterval, now,
-                                new TwitchClient.VolleyCallback() {
-                                    @Override
-                                    public void onComplete(HashMap<Clip, Integer> clips) {
-                                        notSortedHashMap.putAll(clips);
-                                        clipArrayList.clear();
-                                        sortedHashMap = sortByValue(notSortedHashMap);
-                                        for (Map.Entry<Clip, Integer> clip : sortedHashMap.entrySet()){
-                                            clipArrayList.add(clip.getKey());
-                                        }
-                                        clipAdapter.notifyDataSetChanged();
-                                    }
-
-                                    @Override
-                                    public void onComplete(String userImageURL) {
-                                        // Empty
-                                    }
-                                });
-
-                        if (getContext() != null){
-                            requestQueue.add(jsonObjectRequest);
-                        }
-                    }
+                    addJsonObjectRequest(firstTimeInterval, now);
                 }
 
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putInt("lastSelectedTimeInterval", position).apply();
+                ((MainActivity)getContext()).lastSelectedTimeIntervalPosition = position;
             }
 
             @Override
@@ -256,12 +164,33 @@ public class FeedFragment extends Fragment {
         return temp;
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        Log.d(TAG, "onStop: " + prefs.getAll());
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.remove("lastSelectedTimeInterval").apply();
-        Log.d(TAG, "onStop: " + prefs.getAll());
+    private void addJsonObjectRequest(Date firstTimeInterval, Date now){
+        for (String streamerID : ((MainActivity) getActivity()).getStreamerIdList()){
+            JsonObjectRequest jsonObjectRequest = twitchClient.getClipsRequest(
+                    streamerID, 5, firstTimeInterval, now,
+                    new TwitchClient.VolleyCallback() {
+                        @Override
+                        public void onComplete(HashMap<Clip, Integer> clips) {
+                            // Sorting time for a 98x5 clips ~= 250ms, 98x20 clips ~= 800ms
+                            notSortedHashMap.putAll(clips);
+                            clipArrayList.clear();
+                            sortedHashMap = sortByValue(notSortedHashMap);
+                            for (Map.Entry<Clip, Integer> clip : sortedHashMap.entrySet()){
+                                clipArrayList.add(clip.getKey());
+                            }
+                            clipAdapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onComplete(String userImageURL) {
+                            // Empty
+                        }
+                    });
+
+            if (getContext() != null){
+                requestQueue.add(jsonObjectRequest);
+            }
+        }
     }
+
 }

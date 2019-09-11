@@ -28,6 +28,9 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<String> streamerIdList;
 
+    // Time interval position for Spinner. -1 = first time initialization.
+    public int lastSelectedTimeIntervalPosition = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +44,9 @@ public class MainActivity extends AppCompatActivity {
                 getResources().getString(R.string.password)).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                FirebaseDatabase.getInstance().getReference().child("StreamerList").addListenerForSingleValueEvent(new ValueEventListener() {
+                FirebaseDatabase.getInstance().getReference().child("StreamerList")
+//                FirebaseDatabase.getInstance().getReference().child("PopularStreamerList") // for testing purposes
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         for (DataSnapshot childSnapshot : dataSnapshot.getChildren()){
@@ -65,24 +70,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public String singleUserUrlBuilder(String username){
-        StringBuilder url = new StringBuilder("https://api.twitch.tv/helix/users?");
-        url.append("login=").append(username);
-
-        return url.toString();
-    }
-
     public ArrayList<String> getStreamerIdList() {
         return streamerIdList;
     }
 
-    public void backButton(View view){
-        onBackPressed();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "onDestroy: ");
-    }
 }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="portrait_clip_dialog_popup_width">352dp</dimen>
+    <dimen name="portrait_clip_dialog_popup_height">212dp</dimen>
+
+    <dimen name="landscape_clip_dialog_popup_width">552dp</dimen>
+    <dimen name="landscape_clip_dialog_popup_height">312dp</dimen>
+</resources>
