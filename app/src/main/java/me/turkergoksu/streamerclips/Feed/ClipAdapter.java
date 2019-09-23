@@ -103,7 +103,7 @@ public class ClipAdapter extends RecyclerView.Adapter<ClipAdapter.ClipViewHolder
         // User request for profile image
         Volley.newRequestQueue(context).add(twitchClient.getUsersRequest(clip.getBroadcasterID(), new TwitchClient.VolleyCallback() {
             @Override
-            public void onComplete(HashMap<Clip, Integer> clips) {
+            public void onComplete(HashMap<Clip, Long> clips) {
                 // Empty
             }
 

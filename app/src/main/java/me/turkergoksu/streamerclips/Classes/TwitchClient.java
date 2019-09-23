@@ -62,7 +62,7 @@ public class TwitchClient {
     }
 
     public interface VolleyCallback{
-        void onComplete(HashMap<Clip, Integer> clips);
+        void onComplete(HashMap<Clip, Long> clips);
         void onComplete(String userImageURL);
     }
 
@@ -167,7 +167,7 @@ public class TwitchClient {
                     public void onResponse(JSONObject response) {
                         // Success Callback
                         try {
-                            HashMap<Clip, Integer> clips = new HashMap<>();
+                            HashMap<Clip, Long> clips = new HashMap<>();
                             JSONArray data = (JSONArray) response.get("data");
 
                             for (int i = 0; i < data.length(); ++i){
@@ -180,6 +180,7 @@ public class TwitchClient {
                                         child.getString("broadcaster_name"),
                                         child.getString("creator_id"),
                                         child.getString("creator_name"),
+                                        child.getString("game_id"),
                                         child.getString("title"),
                                         child.getInt("view_count"),
                                         child.getString("created_at"),

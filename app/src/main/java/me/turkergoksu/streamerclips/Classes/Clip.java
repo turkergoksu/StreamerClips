@@ -12,13 +12,17 @@ public class Clip implements Parcelable {
     private String broadcasterName;
     private String creatorID;
     private String creatorName;
+    private String gameID;
     private String title;
-    private int viewCount;
+    private long viewCount;
     private String createdAt;
     private String thumbnailImageURL;
 
+    public Clip() {
+    }
+
     public Clip(String id, String url, String embedURL, String broadcasterID, String broadcasterName,
-                String creatorID, String creatorName, String title, int viewCount,
+                String creatorID, String creatorName, String gameID, String title, long viewCount,
                 String createdAt, String thumbnailImageURL) {
         this.id = id;
         this.url = url;
@@ -45,6 +49,21 @@ public class Clip implements Parcelable {
         viewCount = in.readInt();
         createdAt = in.readString();
         thumbnailImageURL = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(id);
+        parcel.writeString(url);
+        parcel.writeString(embedURL);
+        parcel.writeString(broadcasterID);
+        parcel.writeString(broadcasterName);
+        parcel.writeString(creatorID);
+        parcel.writeString(creatorName);
+        parcel.writeString(title);
+        parcel.writeLong(viewCount);
+        parcel.writeString(createdAt);
+        parcel.writeString(thumbnailImageURL);
     }
 
     public static final Creator<Clip> CREATOR = new Creator<Clip>() {
@@ -123,11 +142,11 @@ public class Clip implements Parcelable {
         this.title = title;
     }
 
-    public int getViewCount() {
+    public long getViewCount() {
         return viewCount;
     }
 
-    public void setViewCount(int viewCount) {
+    public void setViewCount(long viewCount) {
         this.viewCount = viewCount;
     }
 
@@ -147,24 +166,17 @@ public class Clip implements Parcelable {
         this.thumbnailImageURL = thumbnailImageURL;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public String getGameID() {
+        return gameID;
+    }
+
+    public void setGameID(String gameID) {
+        this.gameID = gameID;
     }
 
     @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(id);
-        parcel.writeString(url);
-        parcel.writeString(embedURL);
-        parcel.writeString(broadcasterID);
-        parcel.writeString(broadcasterName);
-        parcel.writeString(creatorID);
-        parcel.writeString(creatorName);
-        parcel.writeString(title);
-        parcel.writeInt(viewCount);
-        parcel.writeString(createdAt);
-        parcel.writeString(thumbnailImageURL);
+    public int describeContents() {
+        return 0;
     }
 
 }

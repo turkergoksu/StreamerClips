@@ -14,20 +14,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 import me.turkergoksu.streamerclips.Classes.Clip;
 import me.turkergoksu.streamerclips.MainActivity;
@@ -40,17 +33,20 @@ public class FeedFragment extends Fragment {
     //  ise o kliplerin sıralaması idleri ile beraber Firebase'e gönderilmeli.
     // TODO: 10-Sep-19 Pagination ekle
     // TODO: 10-Sep-19 Kullanıcı istediği yayıncıları ignorelayabilir
+    // TODO: 11-Sep-19 İzlendi indicator ı
+    // TODO: 11-Sep-19 Klip süresi gösterilmeli
+    // TODO: 11-Sep-19 mp4 ile videoyu gösterme kesinlikle eklenmeli
+    // TODO: 12-Sep-19 React with Like Dislike Pepega
+    // TODO: 12-Sep-19 Kullanıcılar tarafından dünün son 7 günün gibi en beğenilen klipleri listesi
 
     private static final String TAG = FeedFragment.class.getSimpleName();
 
-    private RequestQueue requestQueue;
     private TwitchClient twitchClient;
 
     private ArrayList<Clip> clipArrayList;
     private ClipAdapter clipAdapter;
 
-    private HashMap<Clip, Integer> notSortedHashMap;
-    private HashMap<Clip, Integer> sortedHashMap;
+    private DatabaseReference trDatabaseReference;
 
     @Nullable
     @Override
@@ -63,15 +59,12 @@ public class FeedFragment extends Fragment {
     }
 
     private void initializeViews(View view){
+        trDatabaseReference = FirebaseDatabase.getInstance().getReference().child("TR");
 
         if (clipArrayList == null) {
             clipArrayList = new ArrayList<>();
         }
 
-        notSortedHashMap = new HashMap<>();
-        sortedHashMap = new HashMap<>();
-
-        requestQueue = Volley.newRequestQueue(getContext());
         twitchClient = new TwitchClient(
                 getResources().getString(R.string.twitch_client_id),
                 getResources().getString(R.string.twitch_access_token));
@@ -87,48 +80,86 @@ public class FeedFragment extends Fragment {
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
                 int lastSelectedTimeInterval = ((MainActivity)getContext()).lastSelectedTimeIntervalPosition;
 
-                // IF lastSelectedItemInterval not stored in SharedPrefs then It's called for the first time
                 if (lastSelectedTimeInterval == -1){
-                    Calendar calendar = Calendar.getInstance();
-                    Date now = calendar.getTime();
-                    calendar.add(Calendar.DAY_OF_MONTH, -1);
-                    Date firstTimeInterval = calendar.getTime();
-                    // TODO: 10-Sep-19 Add a loading animation
+                    trDatabaseReference.child("oneDay").child("clips").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            for (DataSnapshot childSnapshot : dataSnapshot.getChildren()){
+                                Clip clip = childSnapshot.getValue(Clip.class);
+                                clipArrayList.add(clip);
+                            }
+                            clipAdapter.notifyDataSetChanged();
+                        }
 
-                    addJsonObjectRequest(firstTimeInterval, now);
-                }
-                // IF lastSelectedItemInterval equals current selected position then we don't need to initialize clipArrayList
-                else if (lastSelectedTimeInterval == position){
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                } else if (lastSelectedTimeInterval == position){
                     // Empty
                     return;
-                }
-                // IF lastSelectedItemInterval not equals selected position we need to initialize clipArrayList
-                else {
-                    Calendar calendar = Calendar.getInstance();
-                    Date now = calendar.getTime();
-                    Date firstTimeInterval = null;
-                    notSortedHashMap.clear();
-                    sortedHashMap.clear();
+                } else {
+                    Log.d(TAG, "onItemSelected: " + position);
+                    Log.d(TAG, "onItemSelected:  "+ clipArrayList);
+                    // Clear clipArrayList
                     clipArrayList.clear();
+                    Log.d(TAG, "onItemSelected: " + clipArrayList);
                     clipAdapter.notifyDataSetChanged();
-                    // TODO: 10-Sep-19 Add a loading animation
 
                     switch (position){
                         case 0:
-                            calendar.add(Calendar.DAY_OF_MONTH, -1);
-                            firstTimeInterval = calendar.getTime();
+                            trDatabaseReference.child("oneDay").child("clips").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot childSnapshot : dataSnapshot.getChildren()){
+                                        Clip clip = childSnapshot.getValue(Clip.class);
+                                        clipArrayList.add(clip);
+                                    }
+                                    clipAdapter.notifyDataSetChanged();
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
                             break;
                         case 1:
-                            calendar.add(Calendar.DAY_OF_MONTH, -7);
-                            firstTimeInterval = calendar.getTime();
+                            trDatabaseReference.child("oneWeek").child("clips").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot childSnapshot : dataSnapshot.getChildren()){
+                                        Clip clip = childSnapshot.getValue(Clip.class);
+                                        clipArrayList.add(clip);
+                                    }
+                                    clipAdapter.notifyDataSetChanged();
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
                             break;
                         case 2:
-                            calendar.add(Calendar.DAY_OF_MONTH, -30);
-                            firstTimeInterval = calendar.getTime();
+                            trDatabaseReference.child("oneMonth").child("clips").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot childSnapshot : dataSnapshot.getChildren()){
+                                        Clip clip = childSnapshot.getValue(Clip.class);
+                                        clipArrayList.add(clip);
+                                    }
+                                    clipAdapter.notifyDataSetChanged();
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
                             break;
                     }
-
-                    addJsonObjectRequest(firstTimeInterval, now);
                 }
 
                 ((MainActivity)getContext()).lastSelectedTimeIntervalPosition = position;
@@ -140,57 +171,6 @@ public class FeedFragment extends Fragment {
             }
         });
 
-    }
-
-    public static HashMap<Clip, Integer> sortByValue(HashMap<Clip, Integer> hm) {
-        // Create a list from elements of HashMap
-        List<Map.Entry<Clip, Integer> > list =
-                new LinkedList<Map.Entry<Clip, Integer> >(hm.entrySet());
-
-        // Sort the list
-        Collections.sort(list, new Comparator<Map.Entry<Clip, Integer> >() {
-            public int compare(Map.Entry<Clip, Integer> o1,
-                               Map.Entry<Clip, Integer> o2)
-            {
-                return (o2.getValue()).compareTo(o1.getValue());
-            }
-        });
-
-        // put data from sorted list to hashmap
-        HashMap<Clip, Integer> temp = new LinkedHashMap<Clip, Integer>();
-        for (Map.Entry<Clip, Integer> aa : list) {
-            temp.put(aa.getKey(), aa.getValue());
-        }
-        return temp;
-    }
-
-    private void addJsonObjectRequest(Date firstTimeInterval, Date now){
-        for (String streamerID : ((MainActivity) getActivity()).getStreamerIdList()){
-            JsonObjectRequest jsonObjectRequest = twitchClient.getClipsRequest(
-                    streamerID, 5, firstTimeInterval, now,
-                    new TwitchClient.VolleyCallback() {
-                        @Override
-                        public void onComplete(HashMap<Clip, Integer> clips) {
-                            // Sorting time for a 98x5 clips ~= 250ms, 98x20 clips ~= 800ms
-                            notSortedHashMap.putAll(clips);
-                            clipArrayList.clear();
-                            sortedHashMap = sortByValue(notSortedHashMap);
-                            for (Map.Entry<Clip, Integer> clip : sortedHashMap.entrySet()){
-                                clipArrayList.add(clip.getKey());
-                            }
-                            clipAdapter.notifyDataSetChanged();
-                        }
-
-                        @Override
-                        public void onComplete(String userImageURL) {
-                            // Empty
-                        }
-                    });
-
-            if (getContext() != null){
-                requestQueue.add(jsonObjectRequest);
-            }
-        }
     }
 
 }
