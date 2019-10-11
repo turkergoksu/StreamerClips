@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/colorBackground"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -11,35 +11,65 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <Button
-            android:visibility="gone"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/button_refresh"
-            android:layout_width="wrap_content"
-            android:text="refresh"
-            android:layout_height="wrap_content" />
-
-        <Spinner
+        <org.angmarch.views.NiceSpinner
+            app:textTint="#fff"
+            android:textSize="20sp"
+            app:popupTextAlignment="start"
+            app:arrowTint="#fff"
+            android:backgroundTint="@color/colorBackground"
             android:id="@+id/spinner_timeInterval"
-            android:entries="@array/time_interval"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-        </Spinner>
+            app:backgroundSelector="@drawable/background_selector"
+            app:entries="@array/time_interval"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
     </RelativeLayout>
 
-
-
-    <androidx.recyclerview.widget.RecyclerView
+    <RelativeLayout
+        android:visibility="visible"
         android:layout_below="@id/rl_top_wrapper"
+        android:id="@+id/loadingPanel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center" >
 
-        android:id="@+id/rv_clips"
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true" />
+    </RelativeLayout>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/srl_clips"
+        android:visibility="gone"
+        android:layout_below="@id/rl_top_wrapper"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </androidx.recyclerview.widget.RecyclerView>
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_below="@id/rl_top_wrapper"
+            android:id="@+id/rv_clips"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_cant_get_clips"
+        android:visibility="gone"
+        android:layout_below="@id/rl_top_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:textColor="#fff"
+            android:textSize="20sp"
+            android:text="Klipleri getiremedim ¯\\_(ツ)_/¯"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
 
 </RelativeLayout>

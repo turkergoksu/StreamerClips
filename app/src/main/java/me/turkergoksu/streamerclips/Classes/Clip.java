@@ -17,6 +17,7 @@ public class Clip implements Parcelable {
     private long viewCount;
     private String createdAt;
     private String thumbnailImageURL;
+    private boolean isWatched;
 
     public Clip() {
     }
@@ -49,6 +50,7 @@ public class Clip implements Parcelable {
         viewCount = in.readInt();
         createdAt = in.readString();
         thumbnailImageURL = in.readString();
+        isWatched = in.readBoolean();
     }
 
     @Override
@@ -64,6 +66,7 @@ public class Clip implements Parcelable {
         parcel.writeLong(viewCount);
         parcel.writeString(createdAt);
         parcel.writeString(thumbnailImageURL);
+        parcel.writeBoolean(isWatched);
     }
 
     public static final Creator<Clip> CREATOR = new Creator<Clip>() {
@@ -179,4 +182,12 @@ public class Clip implements Parcelable {
         return 0;
     }
 
+    public boolean isWatched() {
+        return isWatched;
+    }
+
+    public Clip setWatched(boolean watched) {
+        isWatched = watched;
+        return this;
+    }
 }

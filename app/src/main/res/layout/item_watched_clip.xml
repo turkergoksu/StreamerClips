@@ -9,6 +9,7 @@
     android:layout_marginEnd="6dp"
     app:cardElevation="5dp"
     app:cardCornerRadius="8dp"
+    android:foreground="@drawable/watched_clip_overlay"
     app:cardBackgroundColor="@color/colorMenu"
     android:layout_height="wrap_content">
 
@@ -46,7 +47,6 @@
                     android:layout_height="80dp" />
 
                 <TextView
-                    android:visibility="gone"
                     android:layout_margin="1dp"
                     android:id="@+id/tv_watched"
                     android:layout_width="wrap_content"

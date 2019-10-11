@@ -1,4 +1,4 @@
-package me.turkergoksu.streamerclips.ClipDetails;
+package me.turkergoksu.streamerclips.Feed;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import me.turkergoksu.streamerclips.Classes.Clip;
+import me.turkergoksu.streamerclips.MainActivity;
 import me.turkergoksu.streamerclips.R;
 
 public class ClipDialogFragment extends DialogFragment {
