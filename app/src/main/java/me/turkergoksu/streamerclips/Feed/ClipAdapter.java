@@ -45,7 +45,7 @@ public class ClipAdapter extends RecyclerView.Adapter<ClipAdapter.ClipViewHolder
 
     private ArrayList<Clip> clipArrayList;
     private Context context;
-    private TwitchClient twitchClient;
+//    private TwitchClient twitchClient;
     private OnItemClickListener onItemClickListener;
 
     public static class ClipViewHolder extends RecyclerView.ViewHolder {
@@ -75,10 +75,9 @@ public class ClipAdapter extends RecyclerView.Adapter<ClipAdapter.ClipViewHolder
         }
     }
 
-    public ClipAdapter(ArrayList<Clip> clipArrayList, Context context, TwitchClient twitchClient, OnItemClickListener onItemClickListener) {
+    public ClipAdapter(ArrayList<Clip> clipArrayList, Context context, OnItemClickListener onItemClickListener) {
         this.clipArrayList = clipArrayList;
         this.context = context;
-        this.twitchClient = twitchClient;
         this.onItemClickListener = onItemClickListener;
     }
 
@@ -134,17 +133,17 @@ public class ClipAdapter extends RecyclerView.Adapter<ClipAdapter.ClipViewHolder
 //        }
 
         // User request for profile image
-        Volley.newRequestQueue(context).add(twitchClient.getUsersRequest(clip.getBroadcasterID(), new TwitchClient.VolleyCallback() {
-            @Override
-            public void onComplete(HashMap<Clip, Long> clips) {
-                // Empty
-            }
-
-            @Override
-            public void onComplete(String userImageURL) {
-                Glide.with(context).load(userImageURL).into(holder.channelImageView);
-            }
-        }));
+//        Volley.newRequestQueue(context).add(twitchClient.getUsersRequest(clip.getBroadcasterID(), new TwitchClient.VolleyCallback() {
+//            @Override
+//            public void onComplete(HashMap<Clip, Long> clips) {
+//                // Empty
+//            }
+//
+//            @Override
+//            public void onComplete(String userImageURL) {
+//                Glide.with(context).load(userImageURL).into(holder.channelImageView);
+//            }
+//        }));
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

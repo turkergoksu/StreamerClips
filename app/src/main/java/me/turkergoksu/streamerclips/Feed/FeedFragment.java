@@ -21,6 +21,8 @@ import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -39,6 +41,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import me.turkergoksu.streamerclips.Classes.Clip;
+import me.turkergoksu.streamerclips.ClipViewModel;
 import me.turkergoksu.streamerclips.MainActivity;
 import me.turkergoksu.streamerclips.R;
 import me.turkergoksu.streamerclips.Classes.TwitchClient;
@@ -50,8 +53,6 @@ public class FeedFragment extends Fragment {
     // TODO: 12-Sep-19 Kullanıcılar tarafından dünün son 7 günün gibi en beğenilen klipleri listesi
 
     private static final String TAG = FeedFragment.class.getSimpleName();
-
-    private TwitchClient twitchClient;
 
     private ArrayList<Clip> clipArrayList;
     private ClipAdapter clipAdapter;
@@ -66,6 +67,8 @@ public class FeedFragment extends Fragment {
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
     private Set<String> watchedSet;
+
+    private ClipViewModel clipViewModel;
 
     @Nullable
     @Override
@@ -92,10 +95,6 @@ public class FeedFragment extends Fragment {
             clipArrayList = new ArrayList<>();
         }
 
-        twitchClient = new TwitchClient(
-                getResources().getString(R.string.twitch_client_id),
-                getResources().getString(R.string.twitch_access_token));
-
         cantGetClipsLayout = view.findViewById(R.id.rl_cant_get_clips);
         loadingLayout = view.findViewById(R.id.loadingPanel);
         clipsSwipeRefreshLayout = view.findViewById(R.id.srl_clips);
@@ -104,47 +103,66 @@ public class FeedFragment extends Fragment {
             public void onRefresh() {
                 showLoadingAnimation(true);
                 cantGetClipsLayout.setVisibility(View.GONE);
-                getClipsFromDatabase(timeIntervalSpinner.getSelectedIndex());
+
+                clipViewModel = ViewModelProviders.of(FeedFragment.this).get(ClipViewModel.class);
+//                getClipsFromDatabase(timeIntervalSpinner.getSelectedIndex());
+                String timeInterval = null;
+                switch (timeIntervalSpinner.getSelectedIndex()){
+                    case 0:
+                        timeInterval = "oneDay";
+                        break;
+                    case 1:
+                        timeInterval = "oneWeek";
+                        break;
+                    case 2:
+                        timeInterval = "oneMonth";
+                        break;
+                }
+                clipViewModel.getClips(timeInterval).observe(FeedFragment.this, clips -> {
+                    clipArrayList.clear();
+                    clipArrayList.addAll(clips);
+
+                    clipAdapter.notifyDataSetChanged();
+                    showLoadingAnimation(false);
+                });
+
                 clipsSwipeRefreshLayout.setRefreshing(false);
             }
         });
 
         final RecyclerView clipsRecyclerView = view.findViewById(R.id.rv_clips);
         clipsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        clipAdapter = new ClipAdapter(clipArrayList, getContext(), twitchClient, new ClipAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(final View view, final Clip clip) {
-                FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-                Bundle args = new Bundle();
-                args.putParcelable("clip", clip);
-                final ClipDialogFragment clipDialogFragment = new ClipDialogFragment();
+        clipAdapter = new ClipAdapter(clipArrayList, getContext(), (view1, clip) -> {
+            FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+            Bundle args = new Bundle();
+            args.putParcelable("clip", clip);
+            final ClipDialogFragment clipDialogFragment = new ClipDialogFragment();
 
-                clipDialogFragment.setArguments(args);
-                clipDialogFragment.show(fragmentTransaction, "clipDialogFragment");
+            clipDialogFragment.setArguments(args);
+            clipDialogFragment.show(fragmentTransaction, "clipDialogFragment");
 
-                new CountDownTimer(10 * 1000, 10){
-                    @Override
-                    public void onTick(long millisUntilFinished) {
+            new CountDownTimer(10 * 1000, 10){
+                @Override
+                public void onTick(long millisUntilFinished) {
+                }
+
+                @Override
+                public void onFinish() {
+                    if (clipDialogFragment.getDialog() != null){
+                        clip.setWatched(true);
+                        watchedSet.add(clip.getId());
+                        editor.remove("watchedSet");
+                        editor.commit();
+                        editor.putStringSet("watchedSet", watchedSet);
+                        editor.commit();
+
+                        // Set the view as 'watched'
+                        ((CardView) view1).setForeground(getContext().getDrawable(R.drawable.watched_clip_overlay));
+                        TextView isWatchedTextView = ((CardView) view1).findViewById(R.id.tv_watched);
+                        isWatchedTextView.setVisibility(View.VISIBLE);
                     }
-
-                    @Override
-                    public void onFinish() {
-                        if (clipDialogFragment.getDialog() != null){
-                            clip.setWatched(true);
-                            watchedSet.add(clip.getId());
-                            editor.remove("watchedSet");
-                            editor.commit();
-                            editor.putStringSet("watchedSet", watchedSet);
-                            editor.commit();
-
-                            // Set the view as 'watched'
-                            ((CardView)view).setForeground(getContext().getDrawable(R.drawable.watched_clip_overlay));
-                            TextView isWatchedTextView = ((CardView)view).findViewById(R.id.tv_watched);
-                            isWatchedTextView.setVisibility(View.VISIBLE);
-                        }
-                    }
-                }.start();
-            }
+                }
+            }.start();
         });
         clipsRecyclerView.setAdapter(clipAdapter);
 
@@ -152,25 +170,44 @@ public class FeedFragment extends Fragment {
 
         // initialization
         clipArrayList.clear();
-        getClipsFromDatabase(timeIntervalSpinner.getSelectedIndex());
+        clipViewModel = ViewModelProviders.of(this).get(ClipViewModel.class);
+        clipViewModel.getClips("oneDay").observe(this, clips -> {
+            clipArrayList.clear();
+            clipArrayList.addAll(clips);
+
+            clipAdapter.notifyDataSetChanged();
+            showLoadingAnimation(false);
+        });
+//        getClipsFromDatabase(timeIntervalSpinner.getSelectedIndex());
 
         timeIntervalSpinner.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
             @Override
             public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
                 clipArrayList.clear();
 
+                clipViewModel = null;
+                clipViewModel = ViewModelProviders.of(FeedFragment.this).get(ClipViewModel.class);
                 showLoadingAnimation(true);
+                String timeInterval = null;
                 switch (position){
                     case 0:
-                        getClipsFromDatabase(position);
+                        timeInterval = "oneDay";
                         break;
                     case 1:
-                        getClipsFromDatabase(position);
+                        timeInterval = "oneWeek";
                         break;
                     case 2:
-                        getClipsFromDatabase(position);
+                        timeInterval = "oneMonth";
                         break;
                 }
+
+                clipViewModel.getClips(timeInterval).observe(FeedFragment.this, clips -> {
+                    clipArrayList.clear();
+                    clipArrayList.addAll(clips);
+
+                    clipAdapter.notifyDataSetChanged();
+                    showLoadingAnimation(false);
+                });
             }
         });
 
